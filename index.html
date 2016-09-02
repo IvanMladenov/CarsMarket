@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Cars</title>
+    <link rel="stylesheet" href="styles/style.css">
+    <link rel="stylesheet" href="styles/magnific-popup.css">
+    <script src="scripts/libs/jquery-3.1.0.js"></script>
+</head>
+<body>
+    <header>
+        <div class="top-layer">
+            <img src="content/icons/speedometer.png" alt="">
+            <h1 class="main-text">my Cars</h1>
+        </div>
+        <div class="table">
+            <div class="table-row">
+                <div class="table-cell"><a class="nav-a" href=".">Home</a></div>
+                <div class="table-cell"><a class="nav-a" href="#" data-bind="text: !isVisibleMap()?'Show map':'Hide map', click: function(){isVisibleMap(!isVisibleMap())}"></a></div>
+                <div class="table-cell whitespace-control"></div>
+                <div id="about-us" class="table-cell right-text"><a class="nav-a" href="#">About us</a></div>
+                <div id="contact" class="table-cell right-text"><a class="nav-a" href="#">Contact</a></div>
+            </div>
+        </div>
+    </header>
+    <div data-bind="attr: {class: isVisibleMap()?'slider': 'slider closed'}">
+        <div id="map"></div>
+    </div>
+    <div class="content-wrapper" data-bind="visible: true">
+        <aside id="left-menu">
+            <div>
+                <h4 style="text-align: center; margin: 0; line-height: 55px;">Choose filter:</h4>
+            </div>
+            <nav>
+                <ul>
+                    <li>
+                        <button type="button"  data-bind="click: resetFilters()">Reset all</button>
+                    </li>
+                    <li>
+                        <label for="brand-filter">Choose brand:</label><br>
+                        <select class="aside-controls"  data-bind="options: brands, value: brand"  name="model-filter" id="brand-filter"></select>
+                    </li>
+                    <li>
+                        <label for="engine-filter">Choose engine:</label><br>
+                        <select class="aside-controls" data-bind="options: engines, value: engine"  name="engine-filter" id="engine-filter"></select>
+                    </li>
+                    <li>
+                        <label for="year-filter">After year:</label><br>
+                        <select class="aside-controls" data-bind="options: years, value: year"  name="year-filter" id="year-filter"></select>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+        <section>
+            <div class="content">
+                <div class="content-header">
+                    <label for="sorters">Sort by:</label>
+                    <select data-bind="options: sortersArray, value: sorter"  name="sorters" id="sorters"></select>
+                    <div>
+                        <label class="label-checkbox"><input type="radio" name="order" data-bind="checked: sortOrder, checkedValue: true, event{change: resultSort}">Asc</label>
+                        <label class="label-checkbox"><input type="radio" name="order" data-bind="checked: sortOrder, checkedValue: false">Desc</label>
+                    </div>
+                </div>
+                <h2 style="margin: 0 auto; text-align: center" data-bind="if: filteredList().length===0">No results</h2>
+                <ul data-bind="foreach: filteredList">
+                    <li class="result-content">
+                        <div class="main-image" data-bind="style: { backgroundImage: 'url(\'' + images[0] + '\')' },foreach: images">
+                            <a data-bind="attr: {href: $data}" ></a>
+                        </div>
+                        <table>
+                            <tr>
+                                <td><strong>Brand:</strong><span class="car-properties" data-bind="text: brand"></span></td>
+                                <td class="hide-one"><strong>Test:</strong><span class="false">&#x2718;</span></td>
+                                <td><strong>Test:</strong><span class="true">&#x2714;</span></td>
+                                <td><strong>Test:</strong><span></span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Model:</strong><span class="car-properties" data-bind="text: model"></span></td>
+                                <td class="hide-one"><strong>Test:</strong><span class="true">&#x2714;</span></td>
+                                <td><strong>Test:</strong><span class="false">&#x2718;</span></td>
+                                <td><strong>Test:</strong><span class="true">&#x2714;</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Year:</strong><span class="car-properties" data-bind="text: year"></span></td>
+                                <td class="hide-one"><strong>Test:</strong></td>
+                                <td><strong>Test:</strong></td>
+                                <td><strong>Test:</strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Engine:</strong><span class="car-properties" data-bind="text: engine"></span></td>
+                                <td class="hide-one"><strong>Test:</strong></td>
+                                <td><strong>Test:</strong></td>
+                                <td><strong>Test:</strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Color:</strong><span class="car-properties">Blue</span></td>
+                                <td class="hide-one"><strong>Test:</strong></td>
+                                <td><strong>Test:</strong></td>
+                                <td><div class="white-popup mfp-hide" data-bind="text: description"></div><button  class="more-info" type="button">More..</button></td>
+                            </tr>
+                        </table>
+                        <div class="price-container">
+                            <div class="out-price">
+                                <div class="price">
+                                    <span data-bind="text: price.toString().substring(0, price.toString().length-3)"></span>
+                                    <span data-bind="text: price.toString().substring(price.toString().length-3)"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </section>
+    </div>
+    <footer><span style="padding: 3px">Created by: Ivan Mladenov</span></footer>
+    <script src="scripts/libs/knockout.js"></script>
+    <script src="scripts/libs/jquery.magnific-popup.js"></script>
+    <script src="scripts/car.js"></script>
+    <script src="scripts/carViewModel.js"></script>
+    <script>
+        var mapDiv,
+                map;
+        function initMap() {
+            mapDiv = document.getElementById('map');
+            map = new google.maps.Map(mapDiv, {
+                center: {lat: 42.6425401, lng: 23.3983029},
+                zoom: 17
+            });
+
+            var marker = new google.maps.Marker({
+                position: {lat: 42.6425401, lng: 23.3983029},
+                map: map,
+                title: 'I am here'
+            })
+        }
+    </script>
+    <script async defer
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD3Kf1YfCpx0rflcN0K-Pawn2dVKHuTJ-I&callback=initMap">
+    </script>
+    <script>
+            $('.main-image').each(function() { // the containers for all your galleries
+                $(this).magnificPopup({
+                    delegate: 'a', // the selector for gallery item
+                    type: 'image',
+                    gallery: {
+                        enabled:true
+                    }
+                });
+            }).on('click', function (e) {
+                $(e.target).children().first().trigger('click');
+            });
+            $('.more-info').each(function () {
+                $(this).magnificPopup({
+                    items: {src:$(this).prev()},
+                    type: 'inline'
+                });
+            });
+    </script>
+    <script src="scripts/hiddenInfo.js"></script>
+</body>
+</html>
